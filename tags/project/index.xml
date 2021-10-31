@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Griffin Everitt&#39;s Github Site</title>
-    <link>http://griffineveritt.github.io/</link>
-    <description>Recent content on Griffin Everitt&#39;s Github Site</description>
+    <title>Project on Griffin Everitt&#39;s Github Site</title>
+    <link>http://griffineveritt.github.io/tags/project/</link>
+    <description>Recent content in Project on Griffin Everitt&#39;s Github Site</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 30 Oct 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://griffineveritt.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 30 Oct 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://griffineveritt.github.io/tags/project/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Should Barry Bonds be a hall of famer?</title>
       <link>http://griffineveritt.github.io/2021/10/30/should-barry-bonds-be-a-hall-of-famer/</link>
@@ -15,15 +15,6 @@
       <guid>http://griffineveritt.github.io/2021/10/30/should-barry-bonds-be-a-hall-of-famer/</guid>
       <description>Putting the steroids aside.. Barry Bonds had a pretty impressive MLB career. One that accounted for 3 MVP’s, 8 all-star games, 8 gold gloves and 7 silver sluggers.
 It would probably be safe to say that any player with those kind of accolades, who didn’t take steroids, would be voted in to the hall of fame. But we are going to look at how dominant Bonds was and how he compares to current Hall of Fame inductees.</description>
-    </item>
-    
-    <item>
-      <title>Griffin Everitt&#39;s GitHub Blog</title>
-      <link>http://griffineveritt.github.io/about/</link>
-      <pubDate>Tue, 12 Oct 2021 00:00:00 +0000</pubDate>
-      
-      <guid>http://griffineveritt.github.io/about/</guid>
-      <description>This is Griffin&amp;rsquo;s blog.</description>
     </item>
     
   </channel>
