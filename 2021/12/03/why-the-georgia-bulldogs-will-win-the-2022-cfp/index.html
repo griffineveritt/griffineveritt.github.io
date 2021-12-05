@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.88.1" />
+
+
+<title>Why I thought the Georgia Bulldogs would win the 2022 CFP - Griffin Everitt&#39;s Github Site</title>
+<meta property="og:title" content="Why I thought the Georgia Bulldogs would win the 2022 CFP - Griffin Everitt&#39;s Github Site">
+
+
+  <link href='http://griffineveritt.github.io/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/griffineveritt">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/griffineveritt">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">8 min read</span>
+    
+
+    <h1 class="article-title">Why I thought the Georgia Bulldogs would win the 2022 CFP</h1>
+
+    
+    <span class="article-date">2021-12-03</span>
+    
+
+    <div class="article-content">
+      
+<script src="http://griffineveritt.github.io/2021/12/03/why-the-georgia-bulldogs-will-win-the-2022-cfp/index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>The Georgia Bulldogs have proven all season that they stand in a league of their own. They have blown out opponents week after week and are yet to be truly challenged heading into the SEC championship at 12-0 against the Alabama Crimson Tide.</p>
+<p>We are going to take a look at some data from the 2021 season and find out if the Bulldogs are ever going to be challenged or if we should just hand them the National Title right now. But first, let’s make sure that we load our libraries and data.</p>
+<pre class="r"><code>library(tidyverse)
+library(ggplot2)
+library(gt)
+library(ggrepel)</code></pre>
+<pre class="r"><code>cfbd &lt;- read_csv(&quot;Defense21.csv&quot;)
+sec &lt;- read_csv(&quot;SEC.csv&quot;)
+cfbo &lt;- read_csv(&quot;Offense21.csv&quot;)</code></pre>
+<p>Georgia’s defense all year has been suffocating its opponents. They rank first nationally in total defense and that has been a huge part of their success. They have allowed just an average of 6.9 points per game, while only giving up 230.9 yards. Let’s look at how that compares to the other top 25 defenses in the country.</p>
+<pre class="r"><code>top25d &lt;- cfbd %&gt;%
+  group_by(School) %&gt;%
+  filter(Rk &lt; 26) %&gt;%
+  select(Pts, Yds...15) </code></pre>
+<pre class="r"><code>gb &lt;- cfbd %&gt;%
+  group_by(School) %&gt;%
+  filter(School == &quot;Georgia&quot;) %&gt;%
+  select(Pts, Yds...15)</code></pre>
+<pre class="r"><code>ggplot() +
+  geom_point(data = top25d, aes(x=Yds...15, y=Pts)) +
+  labs(
+    title = &quot;Top 25 Defenses in College Football&quot;,
+    subtitle = &quot;Georgia separates themselves from the rest of the pack by allowing the fewest amount of yards and points&quot;,
+    x = &quot;Yards Allowed Per Game&quot;,
+    y = &quot;Points Allowed&quot;,
+    caption = &quot;Source: Sports-Reference/cfb | By Griffin Everitt&quot;
+  ) +
+  theme_minimal() +
+    theme(
+    plot.title = element_text(size = 16, face=&quot;bold&quot;),
+    axis.title = element_text(size = 8),
+    plot.subtitle = element_text(size = 10),
+    panel.grid.minor = element_blank()
+  ) +
+  geom_point(data=gb, aes(x=`Yds...15`, y=`Pts`), color=&quot;red&quot;) + 
+  geom_text_repel(data=gb, aes(x=`Yds...15`, y=`Pts`, label=&quot;#1 Georgia | 6.9 PPG | 230.9 YAPG&quot;))</code></pre>
+<p><img src="http://griffineveritt.github.io/2021/12/03/why-the-georgia-bulldogs-will-win-the-2022-cfp/index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>As you can see Georgia is the clear number one in defense when you look at yards and points allowed per game. The closest to them is Clemson who is allowing 8.1 more PPG and 79.4 more YPG. The next thing we are going to look at is how those yards were given up between the top defenses and see where Georgia makes their money.</p>
+<pre class="r"><code>RuPaYds &lt;- cfbd %&gt;%
+  group_by(School) %&gt;%
+  summarise(
+    SeasonRushingPG = sum(Yds...11),
+    SeasonPassingPG = sum(Yds...8),
+    SeasonPAPG = sum(Pts)
+  ) %&gt;% arrange(SeasonPAPG) %&gt;%
+  filter(SeasonPAPG &lt; 16.5)</code></pre>
+<pre class="r"><code>RuPaYds %&gt;%
+  pivot_longer(
+    cols=starts_with(&quot;Season&quot;), 
+    names_to=&quot;Type&quot;, 
+    values_to=&quot;Yards&quot;
+  ) -&gt; RuPaYdsLong</code></pre>
+<pre class="r"><code>ggplot() + 
+  geom_bar(data=RuPaYdsLong, aes(x=reorder(School, Yards), weight=Yards, fill=Type)) + 
+  coord_flip() +
+  labs(
+    title = &quot;Top 6 College Football Defenses&quot;,
+    subtitle = &quot;Georgia dominates both the run and pass which leads to fewer points from their opponents&quot;,
+    x = &quot;&quot;,
+    y = &quot;Yards + Points Allowed&quot;,
+    caption = &quot;Source: Sports-Reference/cfb | By Griffin Everitt&quot;
+  ) +
+  theme_minimal() +
+    theme(
+    plot.title = element_text(size = 16, face=&quot;bold&quot;),
+    axis.title = element_text(size = 10),
+    plot.subtitle = element_text(size = 10),
+    plot.caption = element_text(size = 8),
+    panel.grid.minor = element_blank()
+  )</code></pre>
+<p><img src="http://griffineveritt.github.io/2021/12/03/why-the-georgia-bulldogs-will-win-the-2022-cfp/index_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>It’s obvious that Georgia’s ability to be sharp against both the run and pass has led to their success at keeping their opponents off the scoreboard. What they have been able to accomplish as a defensive unit throughout the regular season in the SEC is historical. Not only does Georgia have the clear number one defense but their offense also ranks sixth nationally. They are averaging 40.7 points per game on offense while only allowing 6.9. They are beating their opponents by an average of 33.8 points.</p>
+<pre class="r"><code>cfbo %&gt;%
+  select(Rk, School, Pts, Yds...15, TD...9, TD...13) %&gt;%
+  filter(Rk &lt; 11) %&gt;%
+  gt() %&gt;%
+  cols_label(
+    Pts = &quot;PPG&quot;
+  ) %&gt;%
+  cols_label(
+    Yds...15 = &quot;YPG&quot;
+  ) %&gt;%
+  cols_label(
+    TD...9 = &quot;Pass TD&quot;
+  ) %&gt;%
+  cols_label(
+    TD...13 = &quot;Rush TD&quot;
+  ) %&gt;%
+  tab_header(
+    title = &quot;Top 10 College Football Offenses&quot;,
+    subtitle = &quot;Georgia has a very respectable offense to compliment its #1 defense&quot;) %&gt;%
+  tab_style(
+    style = cell_text(color = &quot;black&quot;, weight = &quot;bold&quot;, align = &quot;left&quot;), locations = cells_title(&quot;title&quot;)
+  ) %&gt;%
+  tab_style(
+    style = cell_text(color = &quot;black&quot;, align = &quot;left&quot;), locations = cells_title(&quot;subtitle&quot;)
+  ) %&gt;%
+  tab_source_note(
+    source_note = &quot;By Griffin Everitt&quot;
+  ) %&gt;%
+  tab_source_note(
+    source_note = md(&quot;Source: Sports-Reference/cfb&quot;)
+    ) %&gt;%
+  tab_style(
+    style = cell_text(color = &quot;black&quot;, weight = &quot;bold&quot;), locations = cells_body(
+      columns = vars(School))
+    ) %&gt;%
+  tab_style(
+    style = list(
+      cell_fill(color = &quot;red&quot;),
+      cell_text(color = &quot;White&quot;)
+      ),
+    locations = cells_body(
+      rows = School == &quot;Georgia&quot;)
+  ) %&gt;%
+  opt_row_striping() %&gt;%
+  opt_table_lines(&quot;none&quot;) %&gt;%
+  tab_style(
+    style = cell_borders(sides = c(&quot;top&quot;, &quot;bottom&quot;), 
+                         color = &quot;grey&quot;, weight = px(1)),
+    locations = cells_column_labels(everything())
+  )</code></pre>
+<pre><code>## Warning: `columns = vars(...)` has been deprecated in gt 0.3.0:
+## * please use `columns = c(...)` instead</code></pre>
+<div id="lqutwwqlfs" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#lqutwwqlfs .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: none;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#lqutwwqlfs .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#lqutwwqlfs .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#lqutwwqlfs .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#lqutwwqlfs .gt_bottom_border {
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lqutwwqlfs .gt_col_headings {
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#lqutwwqlfs .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#lqutwwqlfs .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#lqutwwqlfs .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#lqutwwqlfs .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#lqutwwqlfs .gt_column_spanner {
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#lqutwwqlfs .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#lqutwwqlfs .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#lqutwwqlfs .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#lqutwwqlfs .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#lqutwwqlfs .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: none;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#lqutwwqlfs .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#lqutwwqlfs .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lqutwwqlfs .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#lqutwwqlfs .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lqutwwqlfs .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: none;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#lqutwwqlfs .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#lqutwwqlfs .gt_table_body {
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lqutwwqlfs .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#lqutwwqlfs .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#lqutwwqlfs .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#lqutwwqlfs .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#lqutwwqlfs .gt_left {
+  text-align: left;
+}
+
+#lqutwwqlfs .gt_center {
+  text-align: center;
+}
+
+#lqutwwqlfs .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#lqutwwqlfs .gt_font_normal {
+  font-weight: normal;
+}
+
+#lqutwwqlfs .gt_font_bold {
+  font-weight: bold;
+}
+
+#lqutwwqlfs .gt_font_italic {
+  font-style: italic;
+}
+
+#lqutwwqlfs .gt_super {
+  font-size: 65%;
+}
+
+#lqutwwqlfs .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  <thead class="gt_header">
+    <tr>
+      <th colspan="6" class="gt_heading gt_title gt_font_normal" style="color: #000000; text-align: left; font-weight: bold;">Top 10 College Football Offenses</th>
+    </tr>
+    <tr>
+      <th colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="color: #000000; text-align: left;">Georgia has a very respectable offense to compliment its #1 defense</th>
+    </tr>
+  </thead>
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-top-width: 1px; border-top-style: solid; border-top-color: grey; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: grey;">Rk</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="border-top-width: 1px; border-top-style: solid; border-top-color: grey; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: grey;">School</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-top-width: 1px; border-top-style: solid; border-top-color: grey; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: grey;">PPG</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-top-width: 1px; border-top-style: solid; border-top-color: grey; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: grey;">YPG</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-top-width: 1px; border-top-style: solid; border-top-color: grey; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: grey;">Pass TD</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-top-width: 1px; border-top-style: solid; border-top-color: grey; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: grey;">Rush TD</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_right">1</td>
+<td class="gt_row gt_left" style="color: #000000; font-weight: bold;">Ohio State</td>
+<td class="gt_row gt_right">45.5</td>
+<td class="gt_row gt_right">551.3</td>
+<td class="gt_row gt_right">3.3</td>
+<td class="gt_row gt_right">2.0</td></tr>
+    <tr><td class="gt_row gt_right gt_striped">2</td>
+<td class="gt_row gt_left gt_striped" style="color: #000000; font-weight: bold;">Western Kentucky</td>
+<td class="gt_row gt_right gt_striped">43.1</td>
+<td class="gt_row gt_right gt_striped">528.4</td>
+<td class="gt_row gt_right gt_striped">4.4</td>
+<td class="gt_row gt_right gt_striped">0.8</td></tr>
+    <tr><td class="gt_row gt_right">3</td>
+<td class="gt_row gt_left" style="color: #000000; font-weight: bold;">Wake Forest</td>
+<td class="gt_row gt_right">42.9</td>
+<td class="gt_row gt_right">483.7</td>
+<td class="gt_row gt_right">2.8</td>
+<td class="gt_row gt_right">2.4</td></tr>
+    <tr><td class="gt_row gt_right gt_striped">4</td>
+<td class="gt_row gt_left gt_striped" style="color: #000000; font-weight: bold;">Pitt</td>
+<td class="gt_row gt_right gt_striped">42.8</td>
+<td class="gt_row gt_right gt_striped">512.9</td>
+<td class="gt_row gt_right gt_striped">3.4</td>
+<td class="gt_row gt_right gt_striped">1.8</td></tr>
+    <tr><td class="gt_row gt_right">5</td>
+<td class="gt_row gt_left" style="color: #000000; font-weight: bold;">Alabama</td>
+<td class="gt_row gt_right">42.7</td>
+<td class="gt_row gt_right">491.6</td>
+<td class="gt_row gt_right">3.4</td>
+<td class="gt_row gt_right">1.7</td></tr>
+    <tr><td class="gt_row gt_right gt_striped" style="background-color: #FF0000; color: #FFFFFF;">6</td>
+<td class="gt_row gt_left gt_striped" style="color: #FFFFFF; font-weight: bold; background-color: #FF0000;">Georgia</td>
+<td class="gt_row gt_right gt_striped" style="background-color: #FF0000; color: #FFFFFF;">40.7</td>
+<td class="gt_row gt_right gt_striped" style="background-color: #FF0000; color: #FFFFFF;">442.3</td>
+<td class="gt_row gt_right gt_striped" style="background-color: #FF0000; color: #FFFFFF;">2.5</td>
+<td class="gt_row gt_right gt_striped" style="background-color: #FF0000; color: #FFFFFF;">2.3</td></tr>
+    <tr><td class="gt_row gt_right">7</td>
+<td class="gt_row gt_left" style="color: #000000; font-weight: bold;">Coastal Carolina</td>
+<td class="gt_row gt_right">40.4</td>
+<td class="gt_row gt_right">492.3</td>
+<td class="gt_row gt_right">2.4</td>
+<td class="gt_row gt_right">2.8</td></tr>
+    <tr><td class="gt_row gt_right gt_striped">8</td>
+<td class="gt_row gt_left gt_striped" style="color: #000000; font-weight: bold;">Cincinnati</td>
+<td class="gt_row gt_right gt_striped">39.6</td>
+<td class="gt_row gt_right gt_striped">430.9</td>
+<td class="gt_row gt_right gt_striped">2.2</td>
+<td class="gt_row gt_right gt_striped">2.7</td></tr>
+    <tr><td class="gt_row gt_right">9</td>
+<td class="gt_row gt_left" style="color: #000000; font-weight: bold;">Houston</td>
+<td class="gt_row gt_right">38.8</td>
+<td class="gt_row gt_right">421.8</td>
+<td class="gt_row gt_right">2.3</td>
+<td class="gt_row gt_right">2.3</td></tr>
+    <tr><td class="gt_row gt_right gt_striped">10</td>
+<td class="gt_row gt_left gt_striped" style="color: #000000; font-weight: bold;">Tennessee</td>
+<td class="gt_row gt_right gt_striped">38.8</td>
+<td class="gt_row gt_right gt_striped">458.6</td>
+<td class="gt_row gt_right gt_striped">2.3</td>
+<td class="gt_row gt_right gt_striped">2.4</td></tr>
+  </tbody>
+  <tfoot class="gt_sourcenotes">
+    <tr>
+      <td class="gt_sourcenote" colspan="6">By Griffin Everitt</td>
+    </tr>
+    <tr>
+      <td class="gt_sourcenote" colspan="6">Source: Sports-Reference/cfb</td>
+    </tr>
+  </tfoot>
+  
+</table>
+</div>
+<p>I think it was pretty safe to say that Georgia seemed damn near invincible. With the way that their offense was scoring and defense smothering its opponents, I thought there was no way they could ever lose. Unfortunately, they lost and now have me questioning if they are complete frauds. The Georgia Bulldogs may have just fooled everyone into thinking that they would blow through the College Football Playoff. We will find out soon if Georgia can bounce back and prove they are the real deal or if they crumble like the frauds they potentially are.</p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+
