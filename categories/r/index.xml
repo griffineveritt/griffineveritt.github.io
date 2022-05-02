@@ -13,7 +13,7 @@
       <pubDate>Sun, 01 May 2022 00:00:00 +0000</pubDate>
       
       <guid>http://griffineveritt.github.io/2022/05/01/gambling-results/</guid>
-      <description>  </description>
+      <description>For my groups NBA betting model we took a number of factors into mind. We decided to factor in each team’s true shooting percentage, turnover percentage, offensive rebounds, defensive rebounds, three point percentage, offensive efficiency, and defensive efficiency. We figured that these metrics would give us the best shot at predicting the winners based on being a complete team. From there we decided to use cumulative means with all of those metrics and then used a support vector model to determine who was going to win.</description>
     </item>
     
     <item>
